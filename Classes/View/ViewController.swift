@@ -7,21 +7,32 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, CurrencyDataRefreshDelegate {
     
     let viewModel = ViewModel()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         loadLatestCurrencyData()
+        viewModel.startTimerToRefreshData()
+        viewModel.currencyDataRefreshDelegate = self
     }
 
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        viewModel.dataRefreshTimer?.invalidate()
+    }
 
     private func loadLatestCurrencyData() {
         
-        viewModel.loadLatestCurrencyRates(urlStr: Constants.latestCurrencyRatesURL) { (latestCurrencyRates) in
+        viewModel.loadLatestCurrencyRates() { (latestCurrencyRates) in
             print("Latest Currency Rates = \(latestCurrencyRates)")
         }
+    }
+    
+    func currencyDataRefreshed(_ latestCurrencyRates: LatestCurrencyRates) {
+        // refresh UI as new data has arrived
+        print("Data refreshed Latest Currency Rates = \(latestCurrencyRates)")
     }
 }
 
